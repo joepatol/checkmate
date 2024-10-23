@@ -1,6 +1,6 @@
 mod into_iterator;
 mod option;
-mod any_t;
+mod partialeq;
 mod string;
 mod bool;
 mod partialord;

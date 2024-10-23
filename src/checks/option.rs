@@ -1,9 +1,9 @@
 use std::fmt::Debug;
 
-use crate::core::{Should, Checked};
+use crate::core::{Checked, Should, CheckState};
 
-impl<T> Should<Option<T>> {
-    pub fn be_none(self) -> Checked<Option<T>> {
+impl<T, S: CheckState<Option<T>>> Should<Option<T>, S> {
+    pub fn be_none(self) -> S {
         self.match_predicate(|inner| -> Checked<Option<T>> {
             if inner.is_none() {
                 Checked::valid(None)
@@ -13,7 +13,7 @@ impl<T> Should<Option<T>> {
         })
     }
 
-    pub fn not_be_none(self) -> Checked<Option<T>> {
+    pub fn not_be_none(self) -> S {
         self.match_predicate(|inner| -> Checked<Option<T>> {
             if inner.is_none() {
                 Checked::invalid(None, "Should not be None".to_string())
@@ -23,7 +23,7 @@ impl<T> Should<Option<T>> {
         })
     }
 
-    pub fn be_some_with_value<V: PartialEq<T> + Debug>(self, value: V) -> Checked<Option<T>> {
+    pub fn be_some_with_value<V: PartialEq<T> + Debug>(self, value: V) -> S {
         self.match_predicate(|inner| -> Checked<Option<T>> {
             if inner.is_none() {
                 Checked::invalid(inner, format!("Should be Some({value:?})"))

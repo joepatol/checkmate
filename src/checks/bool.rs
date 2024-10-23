@@ -1,7 +1,7 @@
-use crate::core::{Should, Checked};
+use crate::core::{Checked, Should, CheckState};
 
-impl Should<bool> {
-    pub fn be_true(self, message: &str) -> Checked<bool> {
+impl<S: CheckState<bool>> Should<bool, S> {
+    pub fn be_true(self, message: &str) -> S {
         self.match_predicate(|inner| -> Checked<bool> {
             if inner {
                 Checked::valid(inner)
@@ -11,7 +11,7 @@ impl Should<bool> {
         })
     }
 
-    pub fn be_false(self, message: &str) -> Checked<bool> {
+    pub fn be_false(self, message: &str) -> S {
         self.match_predicate(|inner| -> Checked<bool> {
             if inner == false {
                 Checked::valid(inner)

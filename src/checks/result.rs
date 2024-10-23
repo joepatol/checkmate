@@ -1,7 +1,7 @@
-use crate::core::{Should, Checked};
+use crate::core::{Should, Checked, CheckState};
 
-impl<T, E> Should<Result<T, E>> {
-    pub fn be_ok(self) -> Checked<Result<T, E>> {
+impl<T, E, S: CheckState<Result<T, E>>> Should<Result<T, E>, S> {
+    pub fn be_ok(self) -> S {
         self.match_predicate(|inner| -> Checked<Result<T, E>> {
             if inner.is_ok() {
                 Checked::valid(inner)
@@ -11,7 +11,7 @@ impl<T, E> Should<Result<T, E>> {
         })
     }
 
-    pub fn be_err(self) -> Checked<Result<T, E>> {
+    pub fn be_err(self) -> S {
         self.match_predicate(|inner| -> Checked<Result<T, E>> {
             if inner.is_err() {
                 Checked::valid(inner)

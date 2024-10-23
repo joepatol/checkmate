@@ -1,7 +1,7 @@
-use crate::core::{Should, Checked};
+use crate::core::{Checked, Should, CheckState};
 
-impl Should<String> {
-    pub fn contain_substring(self, value: &str) -> Checked<String> {
+impl<S: CheckState<String>> Should<String, S> {
+    pub fn contain_substring(self, value: &str) -> S {
         self.match_predicate(move |inner| -> Checked<String> {
             if inner.contains(value) {
                 Checked::valid(inner)
@@ -11,7 +11,7 @@ impl Should<String> {
         })
     }
 
-    pub fn contain_any_of_the_substrings<'i>(self, values: impl IntoIterator<Item = &'i str> + std::fmt::Debug + Clone) -> Checked<String> {
+    pub fn contain_any_of_the_substrings<'i>(self, values: impl IntoIterator<Item = &'i str> + std::fmt::Debug + Clone) -> S {
         let msg = format!("Should contain one of {values:?}");
         self.match_predicate(|inner| -> Checked<String> {
             for value in values.into_iter(){
@@ -23,7 +23,7 @@ impl Should<String> {
         })
     }
 
-    pub fn contain_all_of_the_substrings<'i>(self, values: impl IntoIterator<Item = &'i str> + std::fmt::Debug + Clone) -> Checked<String> {
+    pub fn contain_all_of_the_substrings<'i>(self, values: impl IntoIterator<Item = &'i str> + std::fmt::Debug + Clone) -> S {
         let msg = format!("Should contain all of {values:?}");
         self.match_predicate(|inner| -> Checked<String> {
             for value in values.into_iter(){
@@ -35,7 +35,7 @@ impl Should<String> {
         })
     }
 
-    pub fn start_with<'a>(self, value: &'a str) -> Checked<String> {
+    pub fn start_with<'a>(self, value: &'a str) -> S {
         self.match_predicate(|inner| -> Checked<String> {
             if inner.starts_with(value) {
                 Checked::valid(inner)
@@ -45,7 +45,7 @@ impl Should<String> {
         })
     }
 
-    pub fn end_with<'a>(self, value: &'a str) -> Checked<String> {
+    pub fn end_with<'a>(self, value: &'a str) -> S {
         self.match_predicate(|inner| -> Checked<String> {
             if inner.ends_with(value) {
                 Checked::valid(inner)
@@ -55,7 +55,7 @@ impl Should<String> {
         })
     }
 
-    pub fn have_length(self, length: usize) -> Checked<String> {
+    pub fn have_length(self, length: usize) -> S {
         self.match_predicate(|inner| -> Checked<String> {
             if inner.len() == length {
                 Checked::valid(inner)
@@ -65,7 +65,7 @@ impl Should<String> {
         })
     }
 
-    pub fn be_empty_str(self) -> Checked<String> {
+    pub fn be_empty_str(self) -> S {
         self.match_predicate(|inner| -> Checked<String> {
             if inner == "" {
                 Checked::valid(inner)
@@ -75,7 +75,7 @@ impl Should<String> {
         })
     }
 
-    pub fn not_be_empty_str(self) -> Checked<String> {
+    pub fn not_be_empty_str(self) -> S {
         self.match_predicate(|inner| -> Checked<String> {
             if inner == "" {
                 Checked::invalid(inner, String::from("Should not be empty"))
@@ -85,7 +85,7 @@ impl Should<String> {
         })
     }
 
-    pub fn be_equivalent_to(self, value: &str) -> Checked<String> {
+    pub fn be_equivalent_to(self, value: &str) -> S {
         self.match_predicate(|inner| -> Checked<String> {
             if value.to_lowercase() == inner.to_lowercase() {
                 Checked::valid(inner)
@@ -95,7 +95,7 @@ impl Should<String> {
         })
     }
 
-    pub fn not_be_equivalent_to(self, value: &str) -> Checked<String> {
+    pub fn not_be_equivalent_to(self, value: &str) -> S {
         self.match_predicate(|inner| -> Checked<String> {
             if value.to_lowercase() == inner.to_lowercase() {
                 Checked::invalid(inner, format!("Should not be equivalent to {value:?}"))
