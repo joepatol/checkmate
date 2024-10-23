@@ -9,7 +9,7 @@ enum MyEnum {
 #[test]
 fn be_int() {
     11
-    .hey_checkmate_this_value()
+    .value()
     .should()
     .be(11)
     .assert_ok();
@@ -18,7 +18,7 @@ fn be_int() {
 #[test]
 fn be_int_err() {
     11
-    .hey_checkmate_this_value()
+    .value()
     .should()
     .be(12)
     .assert_err_with_message("Should be '12'");
@@ -27,7 +27,7 @@ fn be_int_err() {
 #[test]
 fn be_int_err_custom_message() {
     11
-    .hey_checkmate_this_value()
+    .value()
     .should()
     .be(12)
     .with_message("This value should be '12'")
@@ -37,7 +37,7 @@ fn be_int_err_custom_message() {
 #[test]
 fn be_one_of() {
     10
-    .hey_checkmate_this_value()
+    .value()
     .should()
     .be_one_of([11, 12, 10])
     .assert_ok();
@@ -46,7 +46,7 @@ fn be_one_of() {
 #[test]
 fn be_one_of_err() {
     9
-    .hey_checkmate_this_value()
+    .value()
     .should()
     .be_one_of([11, 12, 10])
     .with_message("Should be in the list!")
@@ -58,7 +58,7 @@ fn test_enum() {
     let value = MyEnum::OptionA;
 
     value
-    .hey_checkmate_this_value()
+    .value()
     .should()
     .be(MyEnum::OptionA)
     .assert_ok();
@@ -69,7 +69,7 @@ fn test_err() {
     let value = MyEnum::OptionA;
 
     value
-    .hey_checkmate_this_value()
+    .value()
     .should()
     .be(MyEnum::OptionB)
     .assert_err_with_message("Should be 'OptionB'");

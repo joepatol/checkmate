@@ -230,10 +230,10 @@ impl<T, S: CheckState<T>> Should<T, S> {
 }
 
 pub trait CheckMateEntrypoint<T> {
-    fn hey_checkmate_this_value(self) -> Checked<T>;
-    fn hey_checkmate_this_borrowed_value(&self) -> Checked<&T>;
-    fn hey_checkmate_this_rc_value(self) -> Checked<Rc<T>>;
-    fn hey_checkmate_this_cloned_value(&self) -> Checked<T> where T: Clone + Deref;
+    fn value(self) -> Checked<T>;
+    fn value_as_ref(&self) -> Checked<&T>;
+    fn value_rc(self) -> Checked<Rc<T>>;
+    fn value_cloned(&self) -> Checked<T> where T: Clone + Deref;
 }
 
 pub trait Directive<T, C: CheckState<T>> {
@@ -252,19 +252,19 @@ pub trait Times<T> {
 }
 
 impl<T> CheckMateEntrypoint<T> for T {
-    fn hey_checkmate_this_value(self) -> Checked<T> {
+    fn value(self) -> Checked<T> {
         Checked::valid(self)
     }
 
-    fn hey_checkmate_this_borrowed_value(&self) -> Checked<&T> {
+    fn value_as_ref(&self) -> Checked<&T> {
         Checked::valid(self)
     }
 
-    fn hey_checkmate_this_rc_value(self) -> Checked<Rc<T>> {
+    fn value_rc(self) -> Checked<Rc<T>> {
         Checked::valid(Rc::new(self))
     }
 
-    fn hey_checkmate_this_cloned_value(&self) -> Checked<T> 
+    fn value_cloned(&self) -> Checked<T> 
     where 
         T: Clone + Deref
     {
