@@ -1,4 +1,15 @@
-use crate::core::{Times, Checked};
+use crate::core::{Times, Checked, CheckState};
+
+fn count_valid_checks<T, S: CheckState<T>>(checks: impl Iterator<Item = S>) -> usize {
+    let mut count = 0;
+    for check in checks {
+        match check.get_state_as_ref() {
+            Checked::Valid { value: _ } => count += 1,
+            Checked::Invalid { value: _, message: _ } => continue,
+        }
+    };
+    return count;
+}
 
 pub struct AtLeast(usize);
 
@@ -16,15 +27,12 @@ impl AtLeast {
     }
 }
 
-impl<T> Times<T> for AtLeast{
-    fn do_count(self, inner: T, message: String, checks: impl IntoIterator<Item = bool>) -> Checked<T> {
-        let mut count = 0;
-        for check in checks.into_iter() {
-            if check {
-                count += 1;
-            }
-        };
-        if count >= self.0 {
+impl<T> Times<T> for AtLeast
+where
+    T: IntoIterator
+{
+    fn check<S: CheckState<T::Item>>(self, inner: T, message: String, checks: impl Iterator<Item = S>) -> Checked<T> {
+        if count_valid_checks(checks) >= self.0 {
             Checked::valid(inner)
         } else {
             Checked::invalid(inner, format!("{message} at least {} times", self.0))
@@ -48,15 +56,12 @@ impl AtMost {
     }
 }
 
-impl<T> Times<T> for AtMost{
-    fn do_count(self, inner: T, message: String, checks: impl IntoIterator<Item = bool>) -> Checked<T> {
-        let mut count = 0;
-        for check in checks.into_iter() {
-            if check {
-                count += 1;
-            }
-        };
-        if count <= self.0 {
+impl<T> Times<T> for AtMost
+where
+    T: IntoIterator
+{
+    fn check<S: CheckState<T::Item>>(self, inner: T, message: String, checks: impl Iterator<Item = S>) -> Checked<T> {
+        if count_valid_checks(checks) <= self.0 {
             Checked::valid(inner)
         } else {
             Checked::invalid(inner, format!("{message} at most {} times", self.0))
@@ -80,15 +85,12 @@ impl Exactly {
     }
 }
 
-impl<T> Times<T> for Exactly{
-    fn do_count(self, inner: T, message: String, checks: impl IntoIterator<Item = bool>) -> Checked<T> {
-        let mut count = 0;
-        for check in checks.into_iter() {
-            if check {
-                count += 1;
-            }
-        };
-        if count == self.0 {
+impl<T> Times<T> for Exactly
+where
+    T: IntoIterator
+{
+    fn check<S: CheckState<T::Item>>(self, inner: T, message: String, checks: impl Iterator<Item = S>) -> Checked<T> {
+        if count_valid_checks(checks) >= self.0 {
             Checked::valid(inner)
         } else {
             Checked::invalid(inner, format!("{message} exactly {} times", self.0))

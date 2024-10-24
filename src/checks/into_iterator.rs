@@ -7,20 +7,22 @@ where
     T: IntoIterator + Clone,
     S: CheckState<T>,
 {
-    pub fn match_predicate_times<F, C>(self, predicate: F, times: C, message: String) -> Checked<T>
+    pub fn match_predicate_times<F, C>(self, predicate: F, times: C, message: String) -> S
     where 
         F: Fn(T::Item) -> Checked<T::Item>,
         C: Times<T>,
-    {
-        match self.check_state() {
+    {   
+        let check;
+        match self.check_state_ref() {
             Checked::Valid { value } => {
-                let bools = value.clone().into_iter().map(|v|(predicate(v).is_valid()));
-                times.do_count(value, message, bools)
+                let checks = value.clone().into_iter().map(|v|(predicate(v)));
+                check = times.check(value.to_owned(), message, checks)
             },
             Checked::Invalid { value, message } => {
-                Checked::invalid(value, message.clone())
+                check = Checked::invalid(value.to_owned(), message.clone())
             }
-        }
+        };
+        self.propagate_check(check)
     }
 }
 
@@ -61,7 +63,7 @@ where
         })
     }
 
-    pub fn contain<C: Times<T>>(self, value: U, times: C) -> Checked<T> {
+    pub fn contain<C: Times<T>>(self, value: U, times: C) -> S {
         let predicate = |val: T::Item| -> Checked<T::Item> {
             if val == value {
                 Checked::valid(val)

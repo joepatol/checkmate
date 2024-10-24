@@ -12,7 +12,7 @@ fn be_int() {
     .value()
     .should()
     .be(11)
-    .assert_ok();
+    .assert_valid();
 }
 
 #[test]
@@ -21,7 +21,7 @@ fn be_int_err() {
     .value()
     .should()
     .be(12)
-    .assert_err_with_message("Should be '12'");
+    .assert_invalid_with_message("Should be '12'");
 }
 
 #[test]
@@ -31,7 +31,7 @@ fn be_int_err_custom_message() {
     .should()
     .be(12)
     .with_message("This value should be '12'")
-    .assert_err_with_message("This value should be '12'");
+    .assert_invalid_with_message("This value should be '12'");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn be_one_of() {
     .value()
     .should()
     .be_one_of([11, 12, 10])
-    .assert_ok();
+    .assert_valid();
 }
 
 #[test]
@@ -50,7 +50,7 @@ fn be_one_of_err() {
     .should()
     .be_one_of([11, 12, 10])
     .with_message("Should be in the list!")
-    .assert_err_with_message("Should be in the list!");
+    .assert_invalid_with_message("Should be in the list!");
 }
 
 #[test]
@@ -61,7 +61,7 @@ fn test_enum() {
     .value()
     .should()
     .be(MyEnum::OptionA)
-    .assert_ok();
+    .assert_valid();
 }
 
 #[test]
@@ -72,5 +72,5 @@ fn test_err() {
     .value()
     .should()
     .be(MyEnum::OptionB)
-    .assert_err_with_message("Should be 'OptionB'");
+    .assert_invalid_with_message("Should be 'OptionB'");
 }

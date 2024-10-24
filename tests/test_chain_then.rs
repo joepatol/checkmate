@@ -1,4 +1,5 @@
-use checkmate::{prelude::*, Checked};
+use checkmate::prelude::*;
+use checkmate::Checked;
 
 struct MyStruct {
     attr_1: usize,
@@ -16,5 +17,5 @@ fn check_struct_fields() {
     .then(|s| -> Checked<usize> {
         s.attr_1.value().should().be_greater_than(5)
     })
-    .assert_ok();
+    .assert_valid();
 }
