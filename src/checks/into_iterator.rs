@@ -1,23 +1,24 @@
 use std::fmt::Debug;
 
-use crate::core::{Checked, Should, CheckState, Times};
+use crate::core::{CheckState, Checked, Should, Times};
+use crate::message::format_value;
 
 impl<T, S> Should<T, S>
-where 
+where
     T: IntoIterator + Clone,
     S: CheckState<T>,
 {
     pub fn match_predicate_times<F, C>(self, predicate: F, times: C, message: String) -> S
-    where 
+    where
         F: Fn(T::Item) -> Checked<T::Item>,
         C: Times<T>,
-    {   
+    {
         let check;
         match self.check_state_ref() {
             Checked::Valid { value } => {
-                let checks = value.clone().into_iter().map(|v|(predicate(v)));
+                let checks = value.clone().into_iter().map(|v| (predicate(v)));
                 check = times.check(value.to_owned(), message, checks)
-            },
+            }
             Checked::Invalid { value, message } => {
                 check = Checked::invalid(value.to_owned(), message.clone())
             }
@@ -27,9 +28,9 @@ where
 }
 
 impl<T, S, U> Should<T, S>
-where 
+where
     T: IntoIterator<Item = U> + Clone,
-    T::Item: PartialEq<U>,
+    T::Item: PartialEq<U> + 'static,
     U: Debug,
     S: CheckState<T>,
 {
@@ -38,7 +39,10 @@ where
             if inner.clone().into_iter().count() == count {
                 Checked::valid(inner)
             } else {
-                Checked::invalid(inner, format!("Should contain exactly {count} items"))
+                Checked::invalid(
+                    inner,
+                    format!("Iterator should contain exactly {count} items"),
+                )
             }
         })
     }
@@ -48,8 +52,8 @@ where
             if inner.clone().into_iter().count() == 0 {
                 Checked::valid(inner)
             } else {
-                Checked::invalid(inner, format!("Should be empty"))
-            } 
+                Checked::invalid(inner, format!("Iterator should be empty"))
+            }
         })
     }
 
@@ -58,8 +62,8 @@ where
             if inner.clone().into_iter().count() > 0 {
                 Checked::valid(inner)
             } else {
-                Checked::invalid(inner, format!("Should not be empty"))
-            } 
+                Checked::invalid(inner, format!("Iterator should not be empty"))
+            }
         })
     }
 
@@ -68,45 +72,52 @@ where
             if val == value {
                 Checked::valid(val)
             } else {
-                Checked::invalid(val, format!("Should contain {value:?}"))
+                Checked::invalid(
+                    val,
+                    format!("Iterator should contain {}", format_value(&value)),
+                )
             }
         };
 
-        self.match_predicate_times(predicate, times, format!("Should contain {value:?}"))
+        self.match_predicate_times(
+            predicate,
+            times,
+            format!("Iterator should contain {}", format_value(&value)),
+        )
     }
 
-    pub fn contain_any_of(self, values: impl IntoIterator<Item = U> + Debug) -> S {
-        let msg = format!("Should contain {values:?}");
+    pub fn contain_any_of(self, values: impl IntoIterator<Item = U> + 'static) -> S {
+        let msg = format!("Iterator should contain any of {}", format_value(&values));
         self.match_predicate(|val| -> Checked<T> {
-            for value in values.into_iter(){
+            for value in values.into_iter() {
                 if val.clone().into_iter().any(|x| x == value) {
-                    return Checked::valid(val)
+                    return Checked::valid(val);
                 };
-            };
+            }
             Checked::invalid(val, msg)
         })
     }
 
-    pub fn contain_all_of(self, values: impl IntoIterator<Item = U> + Debug) -> S {
-        let msg = format!("Should contain all of {values:?}");
+    pub fn contain_all_of(self, values: impl IntoIterator<Item = U> + 'static) -> S {
+        let msg = format!("Iterator should contain all of {}", format_value(&values));
         self.match_predicate(|val| -> Checked<T> {
-            for value in values.into_iter(){
+            for value in values.into_iter() {
                 if !val.clone().into_iter().any(|x| x == value) {
-                    return Checked::invalid(val, msg)
+                    return Checked::invalid(val, msg);
                 };
-            };
+            }
             Checked::valid(val)
         })
     }
 
-    pub fn contain_none_of(self, values: impl IntoIterator<Item = U> + Debug) -> S {
-        let msg = format!("Should contain none of {values:?}");
+    pub fn contain_none_of(self, values: impl IntoIterator<Item = U> + 'static) -> S {
+        let msg = format!("Iterator should contain none of {}", format_value(&values));
         self.match_predicate(|val| -> Checked<T> {
-            for value in values.into_iter(){
+            for value in values.into_iter() {
                 if val.clone().into_iter().any(|x| x == value) {
-                    return Checked::invalid(val, msg)
+                    return Checked::invalid(val, msg);
                 };
-            };
+            }
             Checked::valid(val)
         })
     }

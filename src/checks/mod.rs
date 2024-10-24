@@ -4,5 +4,6 @@ mod partialeq;
 mod string;
 mod bool;
 mod partialord;
+mod hashmap;
 mod result;
 mod error;

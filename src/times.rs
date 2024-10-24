@@ -38,6 +38,12 @@ where
             Checked::invalid(inner, format!("{message} at least {} times", self.0))
         }
     }
+
+    fn check_rebuild<S: CheckState<<T as IntoIterator>::Item>>(self, checks: impl Iterator<Item = S>, message: String) -> Checked<impl IntoIterator<Item = <T as IntoIterator>::Item>> {
+        if count_valid_checks(checks) >= self.0 {
+            Checked::valid(checks.into_iter().map(|c| c.g))
+        }
+    }
 }
 
 pub struct AtMost(usize);

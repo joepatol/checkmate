@@ -6,7 +6,7 @@ impl<T, E, S: CheckState<Result<T, E>>> Should<Result<T, E>, S> {
             if inner.is_ok() {
                 Checked::valid(inner)
             } else {
-                Checked::invalid(inner, format!("Should be ok"))
+                Checked::invalid(inner, format!("Should be Ok"))
             }
         })
     }

@@ -38,6 +38,7 @@ where
     T: IntoIterator
 {
     fn check<S: CheckState<T::Item>>(self, inner: T, message: String, checks: impl Iterator<Item = S>) -> Checked<T>;
+    // fn check_rebuild<S: CheckState<T::Item>>(self, checks: impl Iterator<Item = S>, message: String) -> Checked<impl IntoIterator<Item = T::Item>>;
 }
 
 impl<T> CheckMateEntrypoint<T> for T {

@@ -6,7 +6,7 @@ impl<E: Error, S: CheckState<E>> Should<E, S> {
     pub fn have_message(self, message: &str) -> S {
         self.match_predicate(|err| -> Checked<E> {
             if format!("{err}") != message {
-                Checked::invalid(err, format!("Should be {message}"))
+                Checked::invalid(err, format!("Error message should be {message}"))
             } else {
                 Checked::valid(err)
             }
@@ -18,7 +18,7 @@ impl<E: Error, S: CheckState<E>> Should<E, S> {
             if format!("{err}").contains(message) {
                 Checked::valid(err)
             } else {
-                Checked::invalid(err, format!("Error should contain {message}"))
+                Checked::invalid(err, format!("Error message should contain {message}"))
             }
         })
     }

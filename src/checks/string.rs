@@ -1,4 +1,4 @@
-use crate::core::{Checked, Should, CheckState};
+use crate::core::{CheckState, Checked, Should};
 
 impl<S: CheckState<String>> Should<String, S> {
     pub fn contain_substring(self, value: &str) -> S {
@@ -6,31 +6,37 @@ impl<S: CheckState<String>> Should<String, S> {
             if inner.contains(value) {
                 Checked::valid(inner)
             } else {
-                Checked::invalid(inner , format!("Should contain substring '{value}"))
+                Checked::invalid(inner, format!("Should contain substring '{value}"))
             }
         })
     }
 
-    pub fn contain_any_of_the_substrings<'i>(self, values: impl IntoIterator<Item = &'i str> + std::fmt::Debug + Clone) -> S {
+    pub fn contain_any_of_the_substrings<'i>(
+        self,
+        values: impl IntoIterator<Item = &'i str> + std::fmt::Debug + Clone,
+    ) -> S {
         let msg = format!("Should contain one of {values:?}");
         self.match_predicate(|inner| -> Checked<String> {
-            for value in values.into_iter(){
+            for value in values.into_iter() {
                 if inner.clone().contains(value) {
-                    return Checked::valid(inner)
+                    return Checked::valid(inner);
                 };
-            };
+            }
             Checked::invalid(inner, msg)
         })
     }
 
-    pub fn contain_all_of_the_substrings<'i>(self, values: impl IntoIterator<Item = &'i str> + std::fmt::Debug + Clone) -> S {
+    pub fn contain_all_of_the_substrings<'i>(
+        self,
+        values: impl IntoIterator<Item = &'i str> + std::fmt::Debug + Clone,
+    ) -> S {
         let msg = format!("Should contain all of {values:?}");
         self.match_predicate(|inner| -> Checked<String> {
-            for value in values.into_iter(){
+            for value in values.into_iter() {
                 if !inner.clone().contains(value) {
-                    return Checked::invalid(inner, msg)
+                    return Checked::invalid(inner, msg);
                 };
-            };
+            }
             Checked::valid(inner)
         })
     }
